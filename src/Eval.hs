@@ -1,14 +1,16 @@
 {-# LANGUAGE GADTs         #-}
 {-# LANGUAGE TypeOperators #-}
 module Eval where
+import           Builtin
 import           Data.Function
 import           Data.Type.Equality
-import           Syntax
-
+import           Expr
 
 eq :: Type u -> Type v -> Maybe (u :~: v)
 eq TInt TInt = Just Refl
 eq TBool TBool = Just Refl
+eq TChar TChar = Just Refl
+eq TString TString = Just Refl
 eq (TArrow u u') (TArrow v v') = do
   Refl <- eq u  v
   Refl <- eq u' v'
@@ -24,7 +26,7 @@ subs x v u (Var y t)
         Nothing   -> error "ill-typed substitution"
   | otherwise = Var y t
 
-subs x v u (Op b e e') = Op b (subs x v u e) (subs x v u e')
+subs x v u (Builtin b e e') = Builtin b (subs x v u e) (subs x v u e')
 subs x v u (If e e' e'') = If (subs x v u e) (subs x v u e') (subs x v u e'')
 subs x v u (Lambda y t e)
   | x == y = Lambda y t e
@@ -38,19 +40,20 @@ eval (Lit v) = v
 eval (Var v _) = error ("Free variable " ++ v ++ " has no value")
 eval (Lambda x t e) = \v -> eval $ subs x v t e
 eval (App e e') = eval e (eval e')
-eval (Op b e e') = (evalOp b `on` eval) e e'
+eval (Builtin b e e') = (evalBuiltin b `on` eval) e e'
 eval (If b e e')
   | eval b = eval e
   | otherwise = eval e'
 eval (Lift x _) = x
 
 
-
-evalOp :: Op a b -> a -> a -> b
-evalOp Add = (+)
-evalOp Sub = (-)
-evalOp Eq = (==)
-evalOp Lt = (<)
-evalOp Gt = (>)
-evalOp And = (&&)
-evalOp Or = (||)
+evalBuiltin :: Builtin a b -> a -> a -> b
+evalBuiltin Add = (+)
+evalBuiltin Sub = (-)
+evalBuiltin Eq = (==)
+evalBuiltin Lt = (<)
+evalBuiltin Gt = (>)
+evalBuiltin And = (&&)
+evalBuiltin Or = (||)
+evalBuiltin Concat = (++)
+-- evalBuiltin Cons = (:)
