@@ -1,8 +1,15 @@
 
+
+{-# LANGUAGE Rank2Types #-}
 module Parse where
 import           Builtin
 import           Expr
 import           Text.ParserCombinators.Parsec
+
+
+
+expr :: (forall a. Expr a -> b) -> Parser b
+expr = undefined
 
 -- lit :: Parser (Expr a)
 -- lit = bool <|> list
