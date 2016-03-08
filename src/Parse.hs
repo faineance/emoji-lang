@@ -1,31 +1,42 @@
+{-# LANGUAGE OverloadedStrings #-}
 
-
-{-# LANGUAGE Rank2Types #-}
+{-# LANGUAGE Rank2Types        #-}
 module Parse where
 import           Builtin
+import           Control.Applicative
+import           Data.Attoparsec.Char8
 import           Expr
-import           Text.ParserCombinators.Parsec
 
-
-
-expr :: (forall a. Expr a -> b) -> Parser b
+--
+expr :: (forall a. Expr a -> b) -> Parser a
 expr = undefined
 
--- lit :: Parser (Expr a)
--- lit = bool <|> list
+
+
+
+-- expr = bool
+-- lit :: (forall a. Expr a -> b) -> Parser  b
+-- lit = num <|> bool
 --         where
---             bool = (string "👆" >> return Lit True) <|> (string "👇" >> return Lit False)
---             list = Lit [] <$> (string "[" *> many lit <* string "]")
+--             num = do
+--                 y <- string ""
+--                 return (Lit (2 :: Int))
+--             bool = (string "👆" >> return (Lit True)) <|> (string "👇" >> return (Lit False))
 
--- lit :: TypeOf t => Parser (Expr t)
--- lit = bool
 
--- bool ::  Parser (Expr TBool)
--- bool = (char '👆' >> return (Lit True) ) <|> ( char '👇' >> return (Lit False) )
+            -- list = Lit [] <$> (string "[" *> many lit <* string "]")
 
+
+-- bool :: Parser (Expr Bool)
+-- bool = (string "👆" >> return (Lit True)) <|> (string "👇" >> return (Lit False))
+
+-- list = Lit [] <$> (string "[" *> many lit <* string "]")
+
+-- bool = (string "👆" >> return (Lit True) ) <|> ( string "👇" >> return (Lit False) )
+--
 -- list :: TypeOf t =>  Parser (Expr [t])
 -- list = Lit ([] $ (string "🌔" *> many lit <* string "🌖"))
---
+-- --
 -- lam :: TypeOf t => Parser (Expr (String -> t -> Expr (t -> t)))
 -- lam = undefined
 

@@ -1,8 +1,7 @@
 {-# LANGUAGE GADTs          #-}
-{-# LANGUAGE KindSignatures #-}
 module Builtin where
 
-data Type :: * -> * where
+data Type a where
         TInt :: Type Int
         TBool :: Type Bool
         TChar :: Type Char
@@ -25,14 +24,19 @@ instance TypeOf Char where
 instance TypeOf t => TypeOf [t] where
     typeOf _ = TList
 
-data Builtin :: * -> * -> * where
-        Add :: Builtin Int Int
-        Sub :: Builtin Int Int
-        Eq :: Builtin Int Bool
-        Lt :: Builtin Int Bool
-        Gt :: Builtin Int Bool
-        And :: Builtin Bool Bool
-        Or :: Builtin Bool Bool
-        Concat :: Builtin String String
-        Cons :: TypeOf t => Builtin [t] [t]
-        
+data UBuiltin a where
+        Succ :: UBuiltin Int
+        Pred :: UBuiltin Int
+        Not :: UBuiltin Bool
+        Neg :: UBuiltin Int
+
+data BBuiltin a b where
+        Add :: BBuiltin Int Int
+        Sub :: BBuiltin Int Int
+        Eq :: BBuiltin Int Bool
+        Lt :: BBuiltin Int Bool
+        Gt :: BBuiltin Int Bool
+        And :: BBuiltin Bool Bool
+        Or :: BBuiltin Bool Bool
+        Concat :: BBuiltin String String
+        -- Cons :: TypeOf t => BBuiltin [t] [t]

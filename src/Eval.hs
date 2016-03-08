@@ -3,8 +3,10 @@
 module Eval where
 import           Builtin
 import           Data.Function
+
 import           Data.Type.Equality
 import           Expr
+
 
 eq :: Type u -> Type v -> Maybe (u :~: v)
 eq TInt TInt = Just Refl
@@ -25,8 +27,7 @@ subs x v u (Var y t)
         Just Refl -> Lift v u
         Nothing   -> error "ill-typed substitution"
   | otherwise = Var y t
-
-subs x v u (Builtin b e e') = Builtin b (subs x v u e) (subs x v u e')
+subs x v u (BBuiltin b e e') = BBuiltin b (subs x v u e) (subs x v u e')
 subs x v u (If e e' e'') = If (subs x v u e) (subs x v u e') (subs x v u e'')
 subs x v u (Lambda y t e)
   | x == y = Lambda y t e
@@ -40,20 +41,26 @@ eval (Lit v) = v
 eval (Var v _) = error ("Free variable " ++ v ++ " has no value")
 eval (Lambda x t e) = \v -> eval $ subs x v t e
 eval (App e e') = eval e (eval e')
-eval (Builtin b e e') = (evalBuiltin b `on` eval) e e'
+eval (BBuiltin b e e') = (evalBBuiltin b `on` eval) e e'
 eval (If b e e')
   | eval b = eval e
   | otherwise = eval e'
 eval (Lift x _) = x
 
 
-evalBuiltin :: Builtin a b -> a -> a -> b
-evalBuiltin Add = (+)
-evalBuiltin Sub = (-)
-evalBuiltin Eq = (==)
-evalBuiltin Lt = (<)
-evalBuiltin Gt = (>)
-evalBuiltin And = (&&)
-evalBuiltin Or = (||)
-evalBuiltin Concat = (++)
--- evalBuiltin Cons = (:)
+evalBBuiltin :: BBuiltin a b -> a -> a -> b
+evalBBuiltin Add = (+)
+evalBBuiltin Sub = (-)
+evalBBuiltin Eq = (==)
+evalBBuiltin Lt = (<)
+evalBBuiltin Gt = (>)
+evalBBuiltin And = (&&)
+evalBBuiltin Or = (||)
+evalBBuiltin Concat = (++)
+-- evalBBuiltin Cons = (:)
+
+-- evalUBuiltin :: UBuiltin a -> a -> b
+-- evalUBuiltin Succ = succ
+-- evalUBuiltin Pred = pred
+-- evalUBuiltin Not = not
+-- evalUBuiltin Neg = negate
