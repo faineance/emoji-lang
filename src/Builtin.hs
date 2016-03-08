@@ -1,5 +1,32 @@
-{-# LANGUAGE GADTs          #-}
+{-# LANGUAGE FlexibleInstances     #-}
+{-# LANGUAGE GADTs                 #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
 module Builtin where
+import           Data.Function
+
+import           Data.Type.Equality
+
+class TEq a b where
+instance TEq (Type Int) (Type Int)
+instance TEq (Type Bool) (Type Bool)
+instance TEq (Type Char) (Type Char)
+instance TEq (Type String) (Type String)
+instance TypeOf t => TEq (Type [t]) (Type [t])
+instance (TEq a b, TEq c d) => TEq (Type (a -> c)) (Type (b -> d))
+
+-- class TEq a b where
+--      eq  :: a -> b -> Maybe (a :~: b)
+--
+-- instance TEq a b => TEq (Type a) (Type b) where
+--      eq TInt TInt = Just Refl
+--      eq TBool TBool = Just Refl
+--      eq TChar TChar = Just Refl
+--      eq TString TString = Just Refl
+--      eq (TArrow u u') (TArrow v v') = do
+--                Refl <- eq u  v
+--                Refl <- eq u' v'
+--                return Refl
+--      eq _ _ = Nothing
 
 data Type a where
         TInt :: Type Int
